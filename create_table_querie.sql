@@ -6,14 +6,14 @@ CREATE TABLE customers (
     password VARCHAR(100)
 );
 
--- Box Table (formerly Containers Table)
+-- Box Table
 CREATE TABLE box (
     box_id INT AUTO_INCREMENT PRIMARY KEY,
     box_name VARCHAR(100),
     total_items INT,
     description TEXT,
     customer_id INT,
-    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id) ON DELETE CASCADE
 );
 
 -- Items Table
@@ -22,5 +22,6 @@ CREATE TABLE items (
     item_name VARCHAR(100),
     item_description TEXT,
     box_id INT,
-    FOREIGN KEY (box_id) REFERENCES box(box_id)
+    FOREIGN KEY (box_id) REFERENCES box(box_id) ON DELETE CASCADE
 );
+
