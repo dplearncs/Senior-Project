@@ -34,6 +34,25 @@ const addOrDelete = () => {
 
   // console.log(get_Items)
 
+  const user_Name = localStorage.getItem("userName");
+  const userID = localStorage.getItem("userID")
+
+    // mapping through the boxes object and
+  // only getting logged in users boxes
+  const user_Items = boxes.map(box => {
+    if (box.customer_id === parseInt(localStorage.getItem("userID"))) {
+      return {
+        box_id: box.box_id,
+        box_name: box.box_name,
+        total_items: box.total_items,
+        description: box.description,
+        customer_id: box.customer_id
+      };
+    }
+    return null;
+  }).filter(Boolean);
+
+  
   ////////////////////////////////////////////////////////////////////////////////////////////
   useEffect(() => {
     if (localStorage.getItem("localTasks")) {
