@@ -67,9 +67,21 @@ app.get("/profilePage/", (req, res) => {
 // Deleting the container
 app.delete("/profilePage/:id", (req, res) => {
   const boxId = req.params.id;
-  const q = "DELETE FROM `tellycrate`.`box` WHERE (`box_id` = ?);";
+  const q = "DELETE FROM `tellycrate`.`box` WHERE (`box_id` = ?)"
 
   db.query(q, [boxId], (err, data) => {
+    if (err) return res.send(err);
+    return res.json(data);
+  });
+});
+
+// Get all the items
+app.get("/addOrDelete", (req, res) => {
+  const q = "SELECT * FROM `tellycrate`.`items`;"
+
+  const values = [];
+
+  db.query(q, [values], (err, data) => {
     if (err) return res.send(err);
     return res.json(data);
   });

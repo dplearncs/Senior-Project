@@ -2,17 +2,39 @@
 import React, { useState, useEffect } from "react";
 import BoxLogo from "./logo.png";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const addOrDelete = () => {
   //hooks
   const navigate = useNavigate();
+  
+  // Name of the inventory
   const [textValue, setTextValue] = useState("");
+  // 
   const [imageValue, setImageValue] = useState("");
   const [showInputs, setShowInputs] = useState(true);
   //for items in the box
   const [task, setTask] = useState("");
   const [tasks, setTasks] = useState([]);
 
+  ////////////////////////////////////////////////////////////////////////////////////////
+  // Get all the items
+  const [get_Items, set_Items] = useState([]);
+  useEffect(() => {
+    const fetchALlInventory = async () => {
+      try {
+        const res = await axios.get("http://localhost:5050/addOrDelete");
+        set_Items(res.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchALlInventory();
+  }, []);
+
+  // console.log(get_Items)
+
+  ////////////////////////////////////////////////////////////////////////////////////////////
   useEffect(() => {
     if (localStorage.getItem("localTasks")) {
       const storedList = JSON.parse(localStorage.getItem("localTasks"));

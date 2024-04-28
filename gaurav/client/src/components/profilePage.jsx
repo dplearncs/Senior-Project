@@ -47,6 +47,10 @@ const profilePage = () => {
     return null;
   }).filter(Boolean);
 
+  // console.log("*****************************************************")
+  // console.log(boxId2)
+  // console.log("*****************************************************")
+
   const handleLogout = () => {
     localStorage.removeItem("loggedin");
     localStorage.removeItem("userID");
