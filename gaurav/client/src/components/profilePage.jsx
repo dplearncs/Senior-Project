@@ -29,11 +29,23 @@ const profilePage = () => {
     fetchALlInventory();
   }, []);
 
-  // console.log("**********************************************")
-  // console.log(box)
-  // console.log("**********************************************")
-
   const userName = localStorage.getItem("userName");
+  const userID = localStorage.getItem("userID")
+
+  // mapping through the boxes object and
+  // only getting logged in users boxes
+  const boxId2 = boxes.map(box => {
+    if (box.customer_id === parseInt(localStorage.getItem("userID"))) {
+      return {
+        box_id: box.box_id,
+        box_name: box.box_name,
+        total_items: box.total_items,
+        description: box.description,
+        customer_id: box.customer_id
+      };
+    }
+    return null;
+  }).filter(Boolean);
 
   const handleLogout = () => {
     localStorage.removeItem("loggedin");
@@ -102,7 +114,7 @@ const profilePage = () => {
               Add Items or Edit
             </button>
           </div> */}
-          {boxes.map((box) => (
+          {boxId2.map((box) => (
             <div className="w-[500px] h-[500px]  mx-auto bg-blue-100 p-8 rounded-2xl">
               <h2 className="text-4xl text-center py-4">{box.box_name}</h2>
               <img

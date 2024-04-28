@@ -30,8 +30,6 @@ const Login = () => {
     fetchAlluser();
   }, {});
 
-  console.log(user)
-
   // dev function 2
   const handleClick = async (e) => {
     e.preventDefault();
@@ -41,7 +39,6 @@ const Login = () => {
           currentUser.email === input.email &&
           currentUser.password === input.password
         ) {
-          console.log("yes");
           localStorage.setItem("loggedin", true); //this can remain in local storage since it will be for knowing that the user is logged in
           localStorage.setItem("userID", currentUser.customer_id);
           localStorage.setItem("userName", currentUser.first_name);

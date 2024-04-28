@@ -47,8 +47,7 @@ app.post("/register", (req, res) => {
   });
 });
 
-// Creating a container
-app.get("/profilePage", (req, res) => {
+app.get("/profilePage/", (req, res) => {
   // const q =
   //   "INSERT INTO `tellycrate`.`box` (`box_name`, `total_items`, `description`, `customer_id`) VALUES (?)";
   const q = "SELECT * FROM `tellycrate`.`box`;"
