@@ -47,9 +47,8 @@ app.post("/register", (req, res) => {
   });
 });
 
+// get all the box
 app.get("/profilePage/", (req, res) => {
-  // const q =
-  //   "INSERT INTO `tellycrate`.`box` (`box_name`, `total_items`, `description`, `customer_id`) VALUES (?)";
   const q = "SELECT * FROM `tellycrate`.`box`;"
   const values = [
     req.body.box_name,
@@ -64,6 +63,21 @@ app.get("/profilePage/", (req, res) => {
   });
 });
 
+// add box
+  app.post("/profilepage/", (req, res) => {
+    const q = "INSERT INTO `tellycrate`.`box` (`box_name`, `description`, `customer_id`) VALUES (?);"
+    const values = [
+      req.body.box_name,
+      req.body.description,
+      req.body.customer_id,
+    ];
+  
+    db.query(q, [values], (err, data) => {
+      if (err) return res.send(err);
+      return res.json(data);
+    });
+  });
+  
 // Deleting the container
 app.delete("/profilePage/:id", (req, res) => {
   const boxId = req.params.id;
@@ -87,6 +101,29 @@ app.get("/addOrDelete", (req, res) => {
   });
 });
 
+// Delete item
+app.delete("/addOrDelete/:id", (req, res) => {
+  const item_id = req.params.id;
+  const q = "DELETE FROM `tellycrate`.`items` WHERE (`item_id` = ?)"
+
+  db.query(q, [item_id], (err, data) => {
+    if (err) return res.send(err);
+    return res.json(data);
+  });
+});
+
+// Adding items
+app.post("/addOrDelete", (req, res) => {
+  const q =
+    "INSERT INTO `tellycrate`.`items` (`item_name`, `item_description`, `box_id`) VALUES (?)";
+
+  const values = [req.body.item_name, req.body.item_description, req.body.box_id];
+
+  db.query(q, [values], (err, data) => {
+    if (err) return res.send(err);
+    return res.json(data);
+  });
+});
 app.post("");
 
 app.listen(5050, () => {

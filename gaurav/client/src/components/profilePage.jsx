@@ -8,12 +8,10 @@ import { useEffect } from "react";
 const profilePage = () => {
   const navigate = useNavigate();
 
-  // const [input, setInput] = useState({
-  //   first_name: "",
-  //   customer_id: "",
-  //   email: "",
-  //   password: "",
-  // });
+  const [textValue, setTextValue] = useState("");
+  //
+  const [imageValue, setImageValue] = useState("");
+  const [showInputs, setShowInputs] = useState(true);
 
   const [boxes, setBoxes] = useState([]);
   // get all the container or box
@@ -30,22 +28,24 @@ const profilePage = () => {
   }, []);
 
   const userName = localStorage.getItem("userName");
-  const userID = localStorage.getItem("userID")
+  const userID = localStorage.getItem("userID");
 
   // mapping through the boxes object and
   // only getting logged in users boxes
-  const boxId2 = boxes.map(box => {
-    if (box.customer_id === parseInt(localStorage.getItem("userID"))) {
-      return {
-        box_id: box.box_id,
-        box_name: box.box_name,
-        total_items: box.total_items,
-        description: box.description,
-        customer_id: box.customer_id
-      };
-    }
-    return null;
-  }).filter(Boolean);
+  const boxId2 = boxes
+    .map((box) => {
+      if (box.customer_id === parseInt(localStorage.getItem("userID"))) {
+        return {
+          box_id: box.box_id,
+          box_name: box.box_name,
+          total_items: box.total_items,
+          description: box.description,
+          customer_id: box.customer_id,
+        };
+      }
+      return null;
+    })
+    .filter(Boolean);
 
   // console.log("*****************************************************")
   // console.log(boxId2)
@@ -66,14 +66,70 @@ const profilePage = () => {
     }
   };
 
+  //name and picture of incventory
+  useEffect(() => {
+    const savedTextValue = localStorage.getItem("textValue");
+    const savedImageValue = localStorage.getItem("imageValue");
+
+    if (savedTextValue) {
+      setTextValue(savedTextValue);
+    }
+
+    if (savedImageValue) {
+      setImageValue(savedImageValue);
+    }
+
+    if (savedTextValue || savedImageValue) {
+      setShowInputs(false); // Hide inputs if there are saved values
+    }
+  }, []);
+
+  // Update local storage whenever the image input value changes
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageDataUrl = e.target.result;
+        setImageValue(imageDataUrl);
+        localStorage.setItem("imageValue", imageDataUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDisplay = () => {
+    setShowInputs(false);
+  };
+
+  // to add items
+  const [input, setInput] = useState({
+    box_name: "",
+    customer_id: localStorage.getItem("userID"),
+    image_name: "",
+  });
+
+  // dev function 2
+  const handleClick = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post("http://localhost:5050/profilepage", input);
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleAddOrDelete = (box_id) => {
+    localStorage.setItem("boxID", box_id)
+    navigate("/addOrDelete")
+  }
+
   return (
-    <div
-      class="bg-[url(https://img.freepik.com/free-photo/close-up-warehouse-view_23-2148923142.jpg?t=st=1712775495~exp=1712779095~hmac=28eed57d40cee743ab53eb5208d0b0b4a96094ad42f2170e6571b95ac96b94c9&w=1800)]
-     bg-cover bg-no-repeat bg-center h-screen"
-    >
+    <div className="bg-black h-screen bg-repeat-y">
       {" "}
       {/*main div*/}
-      <div className="mx-auto flex justify-between items-center p-4 bg-black">
+      <div className="mx-auto flex justify-between  p-4 bg-black">
         {/* Left side */}
 
         <div className="flex items-center text-white">
@@ -101,25 +157,69 @@ const profilePage = () => {
           </button>
         </div>
       </div>
-      <div className="relative w-full h-screen bg-zinc-900/90">
-        <img className="absolute w-full h-full object-cover mix-blend-overlay" />
-        <div className="flex justify-center items-center h-screen">
-          {/* <div className="w-[500px] h-[500px]  mx-auto bg-blue-100 p-8 rounded-2xl">
-            <h2 className="text-4xl text-center py-4">Inventory #2</h2>
-            <img
-              className="h-72 w-full object-cover object-center rounded-lg"
-              src="https://img.freepik.com/free-photo/boxes-packed-relocation_23-2147758885.jpg?t=st=1713157679~exp=1713161279~hmac=13aab102d6955621a6834a69777bdfcea5c091051b318b6bed1f5e0f02c73965&w=1800"
-              alt="nature image"
-            />
-            <button
-              className="w-full py-3 mt-8 bg-indigo-600 hover:bg-indigo-500 relative text-white rounded-lg"
-              onClick={() => navigate("/addOrDelete")}
-            >
-              Add Items or Edit
-            </button>
-          </div> */}
+      {/* ???????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????*/}
+      <div className=" ">
+        <div>
+          {showInputs ? (
+            <div className="flex justify-center items-center h-full  mx-auto bg-blue-100 p-8 rounded-2xl mt-4">
+              <div className="p-8">
+                <h1 className="text-2xl text-black">
+                  {" "}
+                  Name the inventory
+                  <div>
+                    <input
+                      name="box_name"
+                      required
+                      type="text"
+                      className="border relative bg-white text-black p-2 "
+                      value={input.box_name}
+                      onChange={(e) =>
+                        setInput({ ...input, [e.target.name]: e.target.value })
+                      }
+                      placeholder="Name your inventory..."
+                    />
+                  </div>
+                </h1>
+              </div>
+              <div className="p-8">
+                <h1 className="text-2xl text-black ">
+                  {" "}
+                  Picture of the inventory:
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      setInput({ ...input, [e.target.name]: e.target.value })
+                    }
+                  />
+                </h1>
+              </div>
+              <button
+                className="w-72 py-3 mt-8 bg-indigo-600 hover:bg-indigo-500  text-white"
+                onClick={handleClick}
+              >
+                Create a new inventory
+              </button>
+            </div>
+          ) : (
+            <div className="flex  items-center h-full mx-auto space-x-2 md:space-x-8 p-4">
+              <h1 className="text-5xl font-semibold text-blue-600/100 dark:text-blue-500/100 ">
+                {textValue}
+              </h1>
+              {imageValue && (
+                <img
+                  className=" relative w-55 h-60 border-double border-4 border-black "
+                  src={imageValue}
+                  alt="Uploaded"
+                />
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-3 gap-x-2 gap-y-3 grid-flow-row-dense mt-8 flex">
           {boxId2.map((box) => (
-            <div className="w-[500px] h-[500px]  mx-auto bg-blue-100 p-8 rounded-2xl">
+            <div className=" h-72 bg-blue-100 p-8 rounded-2xl">
               <h2 className="text-4xl text-center py-4">{box.box_name}</h2>
               <img
                 className="h-72 w-full object-cover object-center rounded-lg"
@@ -128,7 +228,7 @@ const profilePage = () => {
               />
               <button
                 className="w-full py-3 mt-8 bg-indigo-600 hover:bg-indigo-500 relative text-white rounded-lg"
-                onClick={() => navigate("/addOrDelete")}
+                onClick={() => handleAddOrDelete(box.box_id)}
               >
                 Add Items or Edit
               </button>
@@ -140,8 +240,8 @@ const profilePage = () => {
               </button>
             </div>
           ))}{" "}
-          {/* second box */}
         </div>
+        {/*????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????*/}
       </div>
     </div>
   );

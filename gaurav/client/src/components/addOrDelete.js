@@ -7,10 +7,10 @@ import axios from "axios";
 const addOrDelete = () => {
   //hooks
   const navigate = useNavigate();
-  
+
   // Name of the inventory
   const [textValue, setTextValue] = useState("");
-  // 
+  //
   const [imageValue, setImageValue] = useState("");
   const [showInputs, setShowInputs] = useState(true);
   //for items in the box
@@ -19,12 +19,12 @@ const addOrDelete = () => {
 
   ////////////////////////////////////////////////////////////////////////////////////////
   // Get all the items
-  const [get_Items, set_Items] = useState([]);
+  const [get_all_Items, set_all_Items] = useState([]);
   useEffect(() => {
     const fetchALlInventory = async () => {
       try {
         const res = await axios.get("http://localhost:5050/addOrDelete");
-        set_Items(res.data);
+        set_all_Items(res.data);
       } catch (err) {
         console.log(err);
       }
@@ -32,27 +32,51 @@ const addOrDelete = () => {
     fetchALlInventory();
   }, []);
 
-  // console.log(get_Items)
-
-  const user_Name = localStorage.getItem("userName");
-  const userID = localStorage.getItem("userID")
-
-    // mapping through the boxes object and
+  console.log(localStorage.getItem("boxID"))
+  // mapping through the boxes object and
   // only getting logged in users boxes
-  const user_Items = boxes.map(box => {
-    if (box.customer_id === parseInt(localStorage.getItem("userID"))) {
-      return {
-        box_id: box.box_id,
-        box_name: box.box_name,
-        total_items: box.total_items,
-        description: box.description,
-        customer_id: box.customer_id
-      };
-    }
-    return null;
-  }).filter(Boolean);
+  const user_Items = get_all_Items
+    .map((item) => {
+      if (item.box_id === parseInt(localStorage.getItem("boxID"))) {
+        return {
+          item_id: item.item_id,
+          item_name: item.item_name,
+          item_description: item.item_description,
+          box_id: item.box_id,
+        };
+      }
+      return null;
+    })
+    .filter(Boolean);
 
-  
+    console.log(user_Items)
+    
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5050/addOrDelete/${id}`);
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // to add items
+  const [input, setInput] = useState({
+    item_name: "",
+    item_description: "",
+    box_id: localStorage.getItem("boxID"),
+  });
+
+  const addItem = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post("http://localhost:5050/addOrDelete", input);
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   ////////////////////////////////////////////////////////////////////////////////////////////
   useEffect(() => {
     if (localStorage.getItem("localTasks")) {
@@ -60,21 +84,6 @@ const addOrDelete = () => {
       setTasks(storedList); //this can stay like this since it is for the session and not for the database
     }
   }, []);
-
-  const addTask = (e) => {
-    if (task) {
-      const newTask = { id: new Date().getTime().toString(), title: task };
-      setTasks([...tasks, newTask]);
-      localStorage.setItem("localTasks", JSON.stringify([...tasks, newTask])); //this is for entering the item into the databse
-      setTask("");
-    }
-  };
-
-  const handleDelete = (task) => {
-    const deleted = tasks.filter((t) => t.id !== task.id);
-    setTasks(deleted);
-    localStorage.setItem("localTasks", JSON.stringify(deleted)); //this will be to delete the item from the databse ex. ( await axios.delete(`http://localhost:8800/books/${id}`);)
-  };
 
   const handleClear = () => {
     setTasks([]);
@@ -99,31 +108,6 @@ const addOrDelete = () => {
       setShowInputs(false); // Hide inputs if there are saved values
     }
   }, []);
-
-  // Update local storage whenever the text input value changes
-  const handleTextChange = (event) => {
-    const value = event.target.value;
-    setTextValue(value);
-    localStorage.setItem("textValue", value);
-  };
-
-  // Update local storage whenever the image input value changes
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageDataUrl = e.target.result;
-        setImageValue(imageDataUrl);
-        localStorage.setItem("imageValue", imageDataUrl);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleDisplay = () => {
-    setShowInputs(false);
-  };
 
   const handleLogout = () => {
     //handling logout
@@ -153,7 +137,9 @@ const addOrDelete = () => {
           </div>
         </div>
 
-        <div className="text-white text-xl py-4 mr-10">Add or Delete Items</div>
+        <div className="text-white text-xl py-4 mr-10 ">
+          Add or Delete Items
+        </div>
 
         <div className="flex">
           <button className="py-4 cursor-pointer relative text-xl w-fit block after:block after:content-[''] after:absolute after:h-[3px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-left mr-10 text-white">
@@ -167,20 +153,20 @@ const addOrDelete = () => {
           </button>
         </div>
       </div>
-      <div className="relative w-full h-screen bg-zinc-900/90">
+      <div className="relative w-full h-screen bg-zinc-900/90 rounded">
         {" "}
         {/*Middle of the page*/}
         <div className="flex items-center h-screen">
-          <div className="w-[900px] h-[1200px]  mx-auto  p-8 rounded-2xl">
-            <div className="flex ">
+          <div className="w-[900px] h-[1200px]  mx-auto  p-8 rounded-2xl rounded">
+            {/* <div className="flex ">
               {showInputs ? (
-                <div className="flex justify-center items-center h-full">
+                <div className="flex justify-center items-center h-full rounded">
                   <div className="p-8">
-                    <h1 className="text-2xl text-blue-600/100 dark:text-blue-500/100">
+                    <h1 className="text-2xl text-blue-600/100 dark:text-blue-500/100 rounded">
                       {" "}
                       Name the inventory
                       <input
-                        className="border relative bg-white p-2 "
+                        className="border relative bg-white p-2 rounded"
                         type="text"
                         value={textValue}
                         onChange={handleTextChange}
@@ -189,7 +175,7 @@ const addOrDelete = () => {
                     </h1>
                   </div>
                   <div className="p-8">
-                    <h1 className="text-2xl text-blue-600/100 dark:text-blue-500/100">
+                    <h1 className="text-2xl text-blue-600/100 dark:text-blue-500/100 rounded">
                       {" "}
                       Picture of the inventory:
                       <input
@@ -200,78 +186,93 @@ const addOrDelete = () => {
                     </h1>
                   </div>
                   <button
-                    className="w-72 py-3 mt-8 bg-indigo-600 hover:bg-indigo-500  text-white"
+                    className="w-72 py-3 mt-8 bg-indigo-600 hover:bg-indigo-500  text-white rounded"
                     onClick={handleDisplay}
                   >
                     Save
                   </button>
                 </div>
               ) : (
-                <div className="flex  items-center h-full mx-auto space-x-2 md:space-x-8 p-4">
-                  <h1 className="text-5xl font-semibold text-blue-600/100 dark:text-blue-500/100 ">
+                <div className="flex  items-center h-full mx-auto space-x-2 md:space-x-8 p-4 rounded">
+                  <h1 className="text-5xl font-semibold text-blue-600/100 dark:text-blue-500/100 rounded">
                     {textValue}
                   </h1>
                   {imageValue && (
                     <img
-                      className=" relative w-55 h-60 border-double border-4 border-black "
+                      className=" relative w-55 h-60 border-double border-4 border-black rounded"
                       src={imageValue}
                       alt="Uploaded"
                     />
                   )}
                 </div>
               )}
-            </div>{" "}
+            </div>{" "} */}
             {/*end of inventory pic and name*/}
             <div className="text-center ">
               {" "}
               {/*ADDING ITEMS*/}
               <div className="">
-                <h1 className="mt-3 text-5xl font-semibold text-blue-600/100 dark:text-blue-500/100">
+                <h1 className="mt-3 text-5xl font-semibold text-blue-600/100 dark:text-blue-500/100 rounded">
                   ADD ITEMS
                 </h1>
                 <div className="col-8">
                   <input
-                    name="task"
+                    name="item_name"
                     type="text"
-                    value={task}
-                    placeholder="add your item..."
-                    className="border relative bg-white p-2 w-full mt-4"
-                    onChange={(e) => setTask(e.target.value)}
+                    value={input.item_name}
+                    placeholder="Add item name..."
+                    className="border relative bg-white p-2 w-full mt-4 rounded"
+                    onChange={(e) =>
+                      setInput({ ...input, [e.target.name]: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="col-8">
+                  <input
+                    name="item_description"
+                    type="text"
+                    value={input.item_description}
+                    placeholder="Add item description..."
+                    className="border relative bg-white p-2 w-full mt-4 rounded"
+                    onChange={(e) =>
+                      setInput({ ...input, [e.target.name]: e.target.value })
+                    }
                   />
                 </div>
                 <div className="col-4">
                   <button
-                    className="w-full py-3 mt-2 bg-indigo-600 hover:bg-indigo-500 relative text-white"
-                    onClick={addTask}
+                    className="w-full py-3 mt-2 bg-indigo-600 hover:bg-indigo-500 relative text-white rounded"
+                    onClick={addItem}
                   >
                     add
                   </button>
                 </div>
                 <div className="text-white">
                   Box has
-                  {!tasks.length
+                  {!user_Items.length
                     ? " no items"
-                    : tasks.length === 1
+                    : user_Items.length === 1
                     ? " 1 item"
-                    : tasks.length > 1
-                    ? ` ${tasks.length} items`
+                    : user_Items.length > 1
+                    ? ` ${user_Items.length} items`
                     : null}
                 </div>
-                {tasks.map((task) => (
-                  <React.Fragment key={task.id}>
+                {user_Items.map((item) => (
+                  <React.Fragment key={item.item_id}>
                     <h1>
                       <h1
-                        className="w-full py-1 mt-2 bg-white text-black relative text-BLACK px-4"
+                        className=" mt-2 bg-white text-black relative text-BLACK px-4 rounded"
                         style={{ textAlign: "left", fontWeight: "bold" }}
                       >
-                        {task.title}
+                        {item.item_name} <br></br>
+                        <p>Item Description: {item.item_description}</p>
                       </h1>
                     </h1>
 
                     <div className="flex relative">
                       <button
-                        className=" mt-2 text-white"
-                        onClick={() => handleDelete(task)}
+                        className="bg-indigo-600 mt-2 text-white px-4 rounded"
+                        onClick={() => handleDelete(item.item_id)}
                       >
                         delete
                       </button>
@@ -281,7 +282,7 @@ const addOrDelete = () => {
                 {!tasks.length ? null : (
                   <div>
                     <button
-                      className="btn btn-secondary  mt-4 mb-4 text-white"
+                      className="btn btn-secondary mt-4 mb-4 text-white"
                       onClick={() => handleClear()}
                     >
                       Clear
