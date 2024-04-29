@@ -32,7 +32,6 @@ const addOrDelete = () => {
     fetchALlInventory();
   }, []);
 
-  console.log(localStorage.getItem("boxID"))
   // mapping through the boxes object and
   // only getting logged in users boxes
   const user_Items = get_all_Items
@@ -48,8 +47,6 @@ const addOrDelete = () => {
       return null;
     })
     .filter(Boolean);
-
-    console.log(user_Items)
     
   const handleDelete = async (id) => {
     try {
