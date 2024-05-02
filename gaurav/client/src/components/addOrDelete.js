@@ -87,7 +87,7 @@ const addOrDelete = () => {
     localStorage.removeItem("localTasks"); //this will be to clear the list of items
   };
 
-  const userName = JSON.parse(localStorage.getItem("user"));
+  const userName = (localStorage.getItem("userName"));
 
   useEffect(() => {
     const savedTextValue = localStorage.getItem("textValue");

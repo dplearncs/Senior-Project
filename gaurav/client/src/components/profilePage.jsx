@@ -5,13 +5,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect } from "react";
 
+
 const profilePage = () => {
   const navigate = useNavigate();
-
-  const [textValue, setTextValue] = useState("");
-  //
-  const [imageValue, setImageValue] = useState("");
-  const [showInputs, setShowInputs] = useState(true);
 
   const [boxes, setBoxes] = useState([]);
   // get all the container or box
@@ -66,42 +62,6 @@ const profilePage = () => {
     }
   };
 
-  //name and picture of incventory
-  useEffect(() => {
-    const savedTextValue = localStorage.getItem("textValue");
-    const savedImageValue = localStorage.getItem("imageValue");
-
-    if (savedTextValue) {
-      setTextValue(savedTextValue);
-    }
-
-    if (savedImageValue) {
-      setImageValue(savedImageValue);
-    }
-
-    if (savedTextValue || savedImageValue) {
-      setShowInputs(false); // Hide inputs if there are saved values
-    }
-  }, []);
-
-  // Update local storage whenever the image input value changes
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageDataUrl = e.target.result;
-        setImageValue(imageDataUrl);
-        localStorage.setItem("imageValue", imageDataUrl);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleDisplay = () => {
-    setShowInputs(false);
-  };
-
   // to add items
   const [input, setInput] = useState({
     box_name: "",
@@ -126,7 +86,12 @@ const profilePage = () => {
   };
 
   return (
-    <div className="bg-black h-screen bg-repeat-y">
+    <div className="bg-[url('https://img.freepik.com/free-photo/close-up-warehouse-view_23-2148923142.jpg?t=st=1712775495~exp=1712779095~hmac=28eed57d40cee743ab53eb5208d0b0b4a96094ad42f2170e6571b95ac96b94c9&w=1800')] 
+    bg-cover
+    bg-no-repeat
+    bg-center h-screen text-center items-center">
+      
+
       {" "}
       {/*main div*/}
       <div className="mx-auto flex justify-between  p-4 bg-black">
@@ -160,8 +125,9 @@ const profilePage = () => {
       {/* ???????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????*/}
       <div className=" ">
         <div>
-          {showInputs ? (
+         
             <div className="flex justify-center items-center h-full  mx-auto bg-blue-100 p-8 rounded-2xl mt-4">
+              
               <div className="p-8">
                 <h1 className="text-2xl text-black">
                   {" "}
@@ -181,19 +147,6 @@ const profilePage = () => {
                   </div>
                 </h1>
               </div>
-              <div className="p-8">
-                <h1 className="text-2xl text-black ">
-                  {" "}
-                  Picture of the inventory:
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) =>
-                      setInput({ ...input, [e.target.name]: e.target.value })
-                    }
-                  />
-                </h1>
-              </div>
               <button
                 className="w-72 py-3 mt-8 bg-indigo-600 hover:bg-indigo-500  text-white"
                 onClick={handleClick}
@@ -201,50 +154,59 @@ const profilePage = () => {
                 Create a new inventory
               </button>
             </div>
-          ) : (
-            <div className="flex  items-center h-full mx-auto space-x-2 md:space-x-8 p-4">
-              <h1 className="text-5xl font-semibold text-blue-600/100 dark:text-blue-500/100 ">
-                {textValue}
-              </h1>
-              {imageValue && (
-                <img
-                  className=" relative w-55 h-60 border-double border-4 border-black "
-                  src={imageValue}
-                  alt="Uploaded"
-                />
-              )}
-            </div>
-          )}
         </div>
 
-        <div className="grid grid-cols-3 gap-x-2 gap-y-3 grid-flow-row-dense mt-8 flex">
+      
+        <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-8 ">
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-blue-100 rounded-2xl">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 ">
+                <tr>
+                    <th scope="col" class="px-6 py-3">
+                        inventory name
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Edit option
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        <span class="sr-only">Delete</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
           {boxId2.map((box) => (
-            <div className=" h-72 bg-blue-100 p-8 rounded-2xl">
-              <h2 className="text-4xl text-center py-4">{box.box_name}</h2>
-              <img
-                className="h-72 w-full object-cover object-center rounded-lg"
-                src="https://img.freepik.com/free-photo/boxes-packed-relocation_23-2147758885.jpg?t=st=1713157679~exp=1713161279~hmac=13aab102d6955621a6834a69777bdfcea5c091051b318b6bed1f5e0f02c73965&w=1800"
-                alt="nature image"
-              />
-              <button
+                <tr class="bg-blue-100 dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-2xl">
+                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white ">
+                    {box.box_name}
+                    </th>
+                    
+                    <td class="px-6 py-4">
+                    <button
                 className="w-full py-3 mt-8 bg-indigo-600 hover:bg-indigo-500 relative text-white rounded-lg"
                 onClick={() => handleAddOrDelete(box.box_id)}
               >
                 Add Items or Edit
               </button>
-              <button
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                    <button
                 className="w-full py-3 mt-8 bg-indigo-600 hover:bg-indigo-500 relative text-white rounded-lg"
                 onClick={() => handleDelete(box.box_id)}
               >
                 Delete container
               </button>
-            </div>
-          ))}{" "}
+                    </td>
+                </tr>
+                ))}{" "}
+            </tbody>
+        </table>
+           
+          
+           </div>
         </div>
 
         {/*????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????*/}
       </div>
-    </div>
+
   );
 };
 
